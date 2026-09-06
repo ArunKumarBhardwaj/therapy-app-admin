@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "therapy-app",
+  "compatibility_date": "2026-09-06",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "main": "vinext/server/fetch-handler",
+  "assets": {
+    "directory": "dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  },
+  "cache": {
+    "enabled": true
+  },
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "VINEXT_KV_CACHE",
+      "id": "1562978f4c1d474ea85a177cf0f35553"
+    }
+  ],
+  "vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://cqhnhaeuxhnhbhyxdlge.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxaG5oYWV1eGhuaGJoeXhkbGdlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg2Nzk1MDMsImV4cCI6MjEwNDI1NTUwM30.9p2SlXGn-DJ5Si2L7mcHKUZAsrbdf_2pFGFmiC4GHNk"
+  }
+}

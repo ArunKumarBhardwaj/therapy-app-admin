@@ -1,0 +1,9 @@
+.DS_Store
+.env
+.env.local
+**/node_modules
+**/.next
+admin/.env*.local
+admin/.db-password
+admin/.supabase-keys.json
+admin/.admin-login
