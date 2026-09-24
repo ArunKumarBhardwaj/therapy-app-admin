@@ -4,13 +4,13 @@ Two apps. One Supabase backend.
 
 `admin` is the public marketing site and the hidden CMS. Start here.
 
-`mobile` is the Expo app. Empty until the CMS can upload services.
+`mobile` is the Expo app. The product name is Ojas.
 
 ## Layout
 
 ```
 admin/      Next.js landing + /admin CMS
-mobile/     Expo SDK 57 (later)
+mobile/     Expo SDK 57 client app
 supabase/   SQL migrations shared by both apps
 ```
 

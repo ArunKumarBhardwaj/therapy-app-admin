@@ -1,0 +1,317 @@
+export type TherapyGroup = 'panchakarma' | 'body' | 'head' | 'eyes' | 'local'
+
+export type Therapy = {
+  slug: string
+  name: string
+  alsoCalled: string | null
+  group: TherapyGroup
+  focus: string
+  summary: string
+  soughtFor: string[]
+  typicalMinutes: number
+  aliases: string[]
+}
+
+export const THERAPY_GROUPS: { id: TherapyGroup; title: string }[] = [
+  { id: 'panchakarma', title: 'Panchakarma' },
+  { id: 'body', title: 'Oil and touch' },
+  { id: 'head', title: 'Head' },
+  { id: 'eyes', title: 'Eyes' },
+  { id: 'local', title: 'Local care' },
+]
+
+export const THERAPIES: Therapy[] = [
+  {
+    slug: 'vamana',
+    name: 'Vamana',
+    alsoCalled: 'Vamanan',
+    group: 'panchakarma',
+    focus: 'Chest, sinuses, and upper digestion',
+    summary:
+      'A supervised kapha cleanse. It is booked only as part of a panchakarma course, after the body has been prepared.',
+    soughtFor: ['Heaviness', 'Sinus congestion', 'Kapha patterns'],
+    typicalMinutes: 90,
+    aliases: ['vamana', 'vamanan'],
+  },
+  {
+    slug: 'virechana',
+    name: 'Virechana',
+    alsoCalled: 'Virechanam',
+    group: 'panchakarma',
+    focus: 'Digestion, liver, and spleen',
+    summary:
+      'A purgation session that clears heat from the digestive tract. The preparation is chosen for the person, not from a fixed script.',
+    soughtFor: ['Heat', 'Skin flare', 'Digestive congestion'],
+    typicalMinutes: 90,
+    aliases: ['virechana', 'virechanam'],
+  },
+  {
+    slug: 'sneha-vasti',
+    name: 'Sneha Vasti',
+    alsoCalled: 'Snehavasthy',
+    group: 'panchakarma',
+    focus: 'Lower digestion',
+    summary:
+      'An oil enema given after a meal, used when vata needs settling through the colon.',
+    soughtFor: ['Vata disturbance', 'Pelvic discomfort', 'Spinal ache'],
+    typicalMinutes: 45,
+    aliases: ['snehavasti', 'snehavasthy', 'snehavasthi'],
+  },
+  {
+    slug: 'nasya',
+    name: 'Nasya',
+    alsoCalled: 'Nasyam',
+    group: 'panchakarma',
+    focus: 'Nose, head, and neck',
+    summary:
+      'Medicated oil given through the nose, the route used for the organs above the neck.',
+    soughtFor: ['Sinus pressure', 'Scalp dryness', 'Head and neck tension'],
+    typicalMinutes: 30,
+    aliases: ['nasya', 'nasyam'],
+  },
+  {
+    slug: 'kashaya-vasti',
+    name: 'Kashaya Vasti',
+    alsoCalled: 'Kashayavasthy',
+    group: 'panchakarma',
+    focus: 'Intestines',
+    summary:
+      'A herbal decoction enema given before a meal, usually paired with sneha vasti in a longer course.',
+    soughtFor: ['Vata patterns', 'Joint stiffness', 'Nervous fatigue'],
+    typicalMinutes: 45,
+    aliases: ['kashayavasti', 'kashayavasthy', 'kashavasthy'],
+  },
+  {
+    slug: 'abhyanga',
+    name: 'Abhyanga',
+    alsoCalled: 'Uzhichil',
+    group: 'body',
+    focus: 'Whole body',
+    summary:
+      'Warm herbal oil worked over the body in long, even strokes. Often taken as a daily ritual.',
+    soughtFor: ['Tiredness', 'Dry skin', 'Unsettled sleep'],
+    typicalMinutes: 60,
+    aliases: ['abhyanga', 'uzhichil'],
+  },
+  {
+    slug: 'pizhichil',
+    name: 'Pizhichil',
+    alsoCalled: null,
+    group: 'body',
+    focus: 'Whole body and joints',
+    summary:
+      'Warm medicated oil poured in a continuous stream while the body is massaged.',
+    soughtFor: ['Joint wear', 'Nervous fatigue', 'Spinal stiffness'],
+    typicalMinutes: 60,
+    aliases: ['pizhichil'],
+  },
+  {
+    slug: 'podikizhi',
+    name: 'Podikizhi',
+    alsoCalled: 'Choorna Pinda Sweda',
+    group: 'body',
+    focus: 'Whole body',
+    summary:
+      'Heated cloth bundles of herbal powder tapped and pressed along the body.',
+    soughtFor: ['Inflamed joints', 'Spinal ache', 'Stiffness'],
+    typicalMinutes: 45,
+    aliases: ['podikizhi', 'choornapindasweda', 'podikizhy'],
+  },
+  {
+    slug: 'udwarthanam',
+    name: 'Udwarthanam',
+    alsoCalled: null,
+    group: 'body',
+    focus: 'Whole body and lymph',
+    summary:
+      'A firm massage with warm herbal powder, moving against the hair to wake the skin.',
+    soughtFor: ['Heaviness', 'Uneven skin tone', 'Early stiffness'],
+    typicalMinutes: 45,
+    aliases: ['udwarthanam', 'udwarthana'],
+  },
+  {
+    slug: 'navarakizhi',
+    name: 'Navarakizhi',
+    alsoCalled: null,
+    group: 'body',
+    focus: 'Whole body',
+    summary:
+      'Soft bundles of cooked navara rice, dipped in warm milk and stroked over the body.',
+    soughtFor: ['Weakness', 'Numbness', 'Muscle wasting'],
+    typicalMinutes: 60,
+    aliases: ['navarakizhi', 'navarakizhy'],
+  },
+  {
+    slug: 'narangakizhi',
+    name: 'Narangakizhi',
+    alsoCalled: null,
+    group: 'body',
+    focus: 'Whole body, especially the low back',
+    summary: 'A firmer bundle massage using fresh lemon and herbs tied in cloth.',
+    soughtFor: ['Low back ache', 'Sciatica', 'Acute joint heat'],
+    typicalMinutes: 45,
+    aliases: ['narangakizhi', 'narangakizhy'],
+  },
+  {
+    slug: 'dhanyamla-dhara',
+    name: 'Dhanyamla Dhara',
+    alsoCalled: null,
+    group: 'body',
+    focus: 'Whole body',
+    summary:
+      'A warm, sour herbal liquid poured in a stream after a light oil massage.',
+    soughtFor: ['Inflamed joints', 'Heaviness', 'Acute stiffness'],
+    typicalMinutes: 45,
+    aliases: ['dhanyamladhara', 'dhanyamla'],
+  },
+  {
+    slug: 'avagaha',
+    name: 'Avagaha',
+    alsoCalled: 'Avagaham',
+    group: 'body',
+    focus: 'Whole body',
+    summary: 'A sit in a warm tub of herbal water after oil has been applied.',
+    soughtFor: ['Low back pain', 'Hip pain', 'Pelvic discomfort'],
+    typicalMinutes: 30,
+    aliases: ['avagaha', 'avagaham'],
+  },
+  {
+    slug: 'thalapothichil',
+    name: 'Thalapothichil',
+    alsoCalled: null,
+    group: 'head',
+    focus: 'Head and scalp',
+    summary: 'Oil on the scalp, then a cool herbal paste covering the head.',
+    soughtFor: ['Mental strain', 'Poor sleep', 'Chronic headache'],
+    typicalMinutes: 45,
+    aliases: ['thalapothichil', 'talapothichil'],
+  },
+  {
+    slug: 'shirovasthi',
+    name: 'Shirovasthi',
+    alsoCalled: 'Sirovasthy',
+    group: 'head',
+    focus: 'Head and scalp',
+    summary: 'Medicated oil held on the head inside a fitted cap for a set time.',
+    soughtFor: ['Nervous strain', 'Chronic headache', 'Facial weakness'],
+    typicalMinutes: 45,
+    aliases: ['shirovasthi', 'sirovasthy', 'shirobasti'],
+  },
+  {
+    slug: 'thalam',
+    name: 'Thalam',
+    alsoCalled: null,
+    group: 'head',
+    focus: 'Crown of the head',
+    summary: 'A small amount of herbal paste or oil placed at the center of the scalp.',
+    soughtFor: ['Sleeplessness', 'Stress', 'Neck stiffness'],
+    typicalMinutes: 20,
+    aliases: ['thalam'],
+  },
+  {
+    slug: 'ksheeradhara',
+    name: 'Ksheeradhara',
+    alsoCalled: null,
+    group: 'head',
+    focus: 'Forehead and head',
+    summary:
+      'A steady stream of herb-infused milk poured on the forehead, with a light oil massage alongside.',
+    soughtFor: ['Heat', 'Headache', 'Restless sleep'],
+    typicalMinutes: 50,
+    aliases: ['ksheeradhara', 'kheeradhara', 'shirodhara'],
+  },
+  {
+    slug: 'ksheera-dhooma',
+    name: 'Ksheera Dhooma',
+    alsoCalled: null,
+    group: 'head',
+    focus: 'Head and neck',
+    summary:
+      'Herbal milk steam directed at the face and neck after oiling, with the eyes covered.',
+    soughtFor: ['Facial stiffness', 'Headache', 'Sense fatigue'],
+    typicalMinutes: 30,
+    aliases: ['ksheeradhooma', 'ksheeradhoomam', 'kheeradhooma'],
+  },
+  {
+    slug: 'tarpana',
+    name: 'Tarpana',
+    alsoCalled: 'Tharpanam',
+    group: 'eyes',
+    focus: 'Eyes',
+    summary:
+      'A dough ring around the eyes holds warm medicated ghee while the eyes rest open.',
+    soughtFor: ['Eye strain', 'Dryness', 'Tired vision'],
+    typicalMinutes: 30,
+    aliases: ['tarpana', 'tharpanam', 'netratarpana'],
+  },
+  {
+    slug: 'putapaka',
+    name: 'Putapaka',
+    alsoCalled: 'Putapakam',
+    group: 'eyes',
+    focus: 'Eyes',
+    summary:
+      'Herbal juice poured over the eyes after tarpana, to clear remaining ghee and cool the ducts.',
+    soughtFor: ['After tarpana', 'Irritated eyes'],
+    typicalMinutes: 20,
+    aliases: ['putapaka', 'putapakam'],
+  },
+  {
+    slug: 'pichu',
+    name: 'Pichu',
+    alsoCalled: null,
+    group: 'local',
+    focus: 'A joint, or the head',
+    summary:
+      'A cloth soaked in warm medicated oil is kept on the sore place so the oil absorbs slowly.',
+    soughtFor: ['Joint pain', 'Cramps', 'Headache'],
+    typicalMinutes: 40,
+    aliases: ['pichu', 'siropichu'],
+  },
+  {
+    slug: 'kati-vasti',
+    name: 'Kati Vasti',
+    alsoCalled: 'Kateevasthy',
+    group: 'local',
+    focus: 'Low back, or another joint',
+    summary: 'A dough dam holds warm oil over the back or another stiff area.',
+    soughtFor: ['Local pain', 'Restricted movement'],
+    typicalMinutes: 40,
+    aliases: ['kativasti', 'kateevasthy', 'katibasti'],
+  },
+  {
+    slug: 'lepana',
+    name: 'Lepana',
+    alsoCalled: 'Lepanam',
+    group: 'local',
+    focus: 'Skin or a joint',
+    summary: 'A herbal paste spread on the area that needs cooling, then left to dry.',
+    soughtFor: ['Local swelling', 'Heat', 'Skin discoloration'],
+    typicalMinutes: 30,
+    aliases: ['lepana', 'lepanam'],
+  },
+  {
+    slug: 'upanaha',
+    name: 'Upanaha',
+    alsoCalled: 'Upanaham',
+    group: 'local',
+    focus: 'A joint',
+    summary:
+      'A thick herbal paste covered with leaves and cloth and left in place, often overnight.',
+    soughtFor: ['Stiff joints', 'Inflamed joints', 'Wasting'],
+    typicalMinutes: 40,
+    aliases: ['upanaha', 'upanaham'],
+  },
+  {
+    slug: 'raktamokshana',
+    name: 'Raktamokshana',
+    alsoCalled: 'Rakthamoksham',
+    group: 'local',
+    focus: 'A local area',
+    summary:
+      'A practitioner-led bloodletting session. It is clinical, and it is booked only when Ojas has published it.',
+    soughtFor: ['Local congestion'],
+    typicalMinutes: 40,
+    aliases: ['raktamokshana', 'rakthamoksham', 'raktamoksha'],
+  },
+]
