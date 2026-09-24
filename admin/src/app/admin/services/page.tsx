@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/table'
 import { formatDuration, formatPrice } from '@/lib/format'
 import { listServices } from '@/lib/services'
+import { ensureTherapyCatalog } from '@/lib/therapy-seed'
 import { requireAdmin } from '@/lib/session'
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 
 export default async function ServicesPage() {
   const auth = await requireAdmin()
+  if (auth) await ensureTherapyCatalog(auth.supabase)
   const services = auth ? await listServices(auth.supabase) : []
 
   return (
@@ -29,7 +31,7 @@ export default async function ServicesPage() {
         <div>
           <h1 className="font-serif text-3xl tracking-tight">Services</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Active services appear on the public page.
+            These are the 25 treatments. Active ones show in the app. Set a price before you take bookings.
           </p>
         </div>
         <Button asChild>

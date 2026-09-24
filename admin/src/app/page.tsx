@@ -26,8 +26,8 @@ export default async function HomePage() {
     <div className="min-h-full bg-background text-foreground">
       <section className="relative min-h-[100svh] text-[#f4f6f3]">
         <Image
-          src="/landing/haven-hero-room.png"
-          alt="Two chairs facing each other in a quiet room, a box of tissues on the table between them."
+          src="/landing/ojas-hero.png"
+          alt="A brass bowl of oil, folded linen, and herbs on a wooden table beside a window."
           fill
           priority
           sizes="100vw"
@@ -36,16 +36,16 @@ export default async function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
 
         <header className="absolute inset-x-0 top-0 z-10 flex items-center justify-between px-6 py-7 sm:px-10">
-          <p className="text-[15px] font-medium tracking-tight">Haven</p>
-          <p className="text-sm text-white/70">Private practice</p>
+          <p className="text-[15px] font-medium tracking-tight">Ojas</p>
+          <p className="text-sm text-white/70">Ayurvedic treatments</p>
         </header>
 
         <div className="absolute inset-x-0 bottom-0 z-10 px-6 pb-16 sm:px-10 sm:pb-20">
           <h1 className="max-w-[14ch] font-serif text-[2.75rem] leading-[1.05] font-medium tracking-[-0.03em] text-balance sm:text-6xl lg:text-7xl">
-            Come in. Sit down. Say the thing you have been carrying.
+            Oil, herbs, and time.
           </h1>
           <p className="mt-6 max-w-[36ch] text-base leading-7 text-white/80 sm:text-lg">
-            One room. One hour. Yours.
+            One treatment. One hour. Yours.
           </p>
         </div>
       </section>
@@ -53,29 +53,29 @@ export default async function HomePage() {
       <section className="grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
         <div className="relative min-h-[70vh] lg:min-h-[92vh]">
           <Image
-            src="/landing/haven-still-life.png"
-            alt="A ceramic cup and a green cloth-bound book on a dark wooden table."
+            src="/landing/ojas-still.png"
+            alt="A ceramic bowl of golden oil, a wooden spoon, and tulsi leaves on a dark table."
             fill
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
           />
         </div>
-        <div className="flex flex-col justify-end bg-[#1f3d32] px-6 py-16 text-[#eef1ee] sm:px-12 lg:px-16 lg:py-24">
+        <div className="flex flex-col justify-end bg-[#1a4336] px-6 py-16 text-[#f3efe4] sm:px-12 lg:px-16 lg:py-24">
           <h2 className="max-w-[16ch] font-serif text-4xl leading-[1.1] font-medium tracking-[-0.02em] text-balance sm:text-5xl">
-            You book a time. You arrive. We sit with whatever you brought.
+            You book a treatment. You arrive. We work with what you brought.
           </h2>
-          <p className="mt-8 max-w-[38ch] text-base leading-7 text-[#c5d0c8]">
-            Haven is a one-to-one therapy room for adults. We talk about what
-            is happening now, not a script. You leave with something you can
-            use the rest of the week.
+          <p className="mt-8 max-w-[38ch] text-base leading-7 text-[#d7e0d4]">
+            Ojas is a room for Ayurvedic treatments. Panchakarma, oil
+            therapies, and local care. You leave with the rest of the week
+            still ahead of you.
           </p>
         </div>
       </section>
 
       <section className="relative h-[64vh] min-h-[420px] sm:h-[78vh]">
         <Image
-          src="/landing/haven-doorway.png"
-          alt="An open wooden door looking into a sunlit room with a single chair by the window."
+          src="/landing/ojas-room.png"
+          alt="An open wooden door looking into a sunlit treatment room with a linen-covered table."
           fill
           sizes="100vw"
           className="object-cover object-center"
@@ -85,7 +85,7 @@ export default async function HomePage() {
       {services.length > 0 ? (
         <section className="mx-auto w-full max-w-3xl px-6 py-20 sm:px-10">
           <h2 className="font-serif text-3xl font-medium tracking-[-0.02em]">
-            Offerings
+            Treatments
           </h2>
           <ul className="mt-8 divide-y divide-border border-y border-border">
             {services.map((service) => (
@@ -100,7 +100,7 @@ export default async function HomePage() {
       ) : null}
 
       <footer className="flex items-center justify-between px-6 py-8 text-sm text-muted-foreground sm:px-10">
-        <p>Haven</p>
+        <p>Ojas</p>
         <Link href="/login" className="hover:text-foreground">
           Staff
         </Link>

@@ -17,7 +17,7 @@ export default function AdminLayout({
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-baseline gap-6">
             <Link href="/admin" className="font-serif text-xl tracking-tight">
-              Haven
+              Ojas
             </Link>
             <nav className="flex gap-4">
               <AdminNavLink href="/admin">Dashboard</AdminNavLink>

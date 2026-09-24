@@ -29,7 +29,7 @@ export default async function LoginPage() {
     <div className="flex min-h-full flex-col items-center justify-center px-6 py-16">
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2">
-          <p className="font-serif text-2xl tracking-tight">Haven</p>
+          <p className="font-serif text-2xl tracking-tight">Ojas</p>
           <h1 className="text-lg font-medium">Admin sign in</h1>
           <p className="text-sm text-muted-foreground">
             Staff only. There is no public sign up.
@@ -38,7 +38,7 @@ export default async function LoginPage() {
         <LoginForm defaults={devLoginDefaults()} />
         <p className="text-sm text-muted-foreground">
           <Link href="/" className="hover:text-foreground">
-            Back to the practice
+            Back to Ojas
           </Link>
         </p>
       </div>

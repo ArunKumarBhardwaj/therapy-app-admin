@@ -16,17 +16,17 @@ const display = Fraunces({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Haven',
-    template: '%s · Haven',
+    default: 'Ojas',
+    template: '%s · Ojas',
   },
-  description: 'Private therapy for adults. One room, one conversation, no rush.',
+  description: 'Ayurvedic treatments. Panchakarma, oil therapies, and local care.',
 }
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html
       lang="en"
-      className={`${sans.variable} ${display.variable} h-full antialiased`}
+      className={`${sans.variable} ${display.variable} h-full scroll-smooth antialiased motion-reduce:scroll-auto`}
     >
       <body className="flex min-h-full flex-col">
         {children}
