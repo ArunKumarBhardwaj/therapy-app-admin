@@ -6,19 +6,17 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { StyleSheet } from 'react-native-unistyles'
 import { Button } from '@/components/button'
-import { PressableScale } from '@/components/pressable-scale'
 import { StatTile } from '@/components/stat-tile'
 import { AuthPrompt } from '@/features/auth/auth-prompt'
 import { useSession } from '@/features/auth/session'
 import { cancelBooking, listMyBookings } from '@/features/bookings/api'
 import { StatusPill } from '@/features/bookings/status-pill'
 import { summarize } from '@/features/bookings/summary'
-import { therapyImage } from '@/features/therapies/art'
-import { THERAPIES } from '@/features/therapies/catalog'
-import { therapyForTitle } from '@/features/therapies/offerings'
+import { mediaUrl, useServices } from '@/features/therapies/api'
 import { TherapyStrip } from '@/features/therapies/therapy-strip'
+import { therapyGroup, useZoomSource, ZoomViewport } from '@/features/therapies/transition'
 import { formatVisit } from '@/lib/format'
-import type { Booking } from '@/lib/domain'
+import type { Booking, Service } from '@/lib/domain'
 import { EASE_OUT, listEnter, PRESS } from '@/lib/motion'
 import { palette } from '@/theme/unistyles'
 import { ms } from '@/lib/scale'
@@ -32,6 +30,7 @@ export function BookingsScreen() {
   const [refreshing, setRefreshing] = useState(false)
   const [tab, setTab] = useState<Tab>('upcoming')
   const insets = useSafeAreaInsets()
+  const { services } = useServices()
 
   async function load() {
     if (status !== 'signed-in') return
@@ -48,10 +47,8 @@ export function BookingsScreen() {
   })
 
   const summary = summarize(bookings)
-  const booked = new Set(
-    bookings.map((booking) => therapyForTitle(booking.serviceTitle)?.slug).filter(Boolean),
-  )
-  const explore = THERAPIES.filter((therapy) => !booked.has(therapy.slug)).slice(0, 8)
+  const booked = new Set(bookings.map((booking) => booking.serviceId))
+  const explore = services.filter((service) => !booked.has(service.id)).slice(0, 8)
 
   if (status === 'loading') {
     return <View style={styles.screen} />
@@ -62,7 +59,7 @@ export function BookingsScreen() {
       <AuthPrompt
         title="Your bookings"
         body="Sign in to see the times you have requested."
-        image={require('../../../../assets/therapy-abhyanga.png')}
+        image={mediaUrl(services[0]?.imagePath ?? null)}
       />
     )
   }
@@ -72,81 +69,83 @@ export function BookingsScreen() {
 
   return (
     <View style={styles.screen}>
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: 16 + insets.top, paddingBottom: 40 + insets.bottom },
-        ]}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            tintColor={palette.primary}
-            colors={[palette.primary]}
-            onRefresh={() => {
-              setRefreshing(true)
-              void load().finally(() => setRefreshing(false))
-            }}
-          />
-        }
-      >
-        <Text style={styles.title}>Bookings</Text>
-        {error ? <Text style={styles.error}>{error}</Text> : null}
+      <ZoomViewport>
+        <ScrollView
+          contentContainerStyle={[
+            styles.content,
+            { paddingTop: 16 + insets.top, paddingBottom: 40 + insets.bottom },
+          ]}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              tintColor={palette.primary}
+              colors={[palette.primary]}
+              onRefresh={() => {
+                setRefreshing(true)
+                void load().finally(() => setRefreshing(false))
+              }}
+            />
+          }
+        >
+          <Text style={styles.title}>Bookings</Text>
+          {error ? <Text style={styles.error}>{error}</Text> : null}
 
-        <Animated.View entering={listEnter(0)} style={styles.stats}>
-          <StatTile value={summary.upcoming.length} label="Upcoming" />
-          <StatTile value={summary.pending} label="Pending" />
-          <StatTile value={summary.completed} label="Completed" />
-        </Animated.View>
-
-        {next ? (
-          <Animated.View entering={listEnter(1)}>
-            <NextVisit booking={next} />
+          <Animated.View entering={listEnter(0)} style={styles.stats}>
+            <StatTile value={summary.upcoming.length} label="Upcoming" />
+            <StatTile value={summary.pending} label="Pending" />
+            <StatTile value={summary.completed} label="Completed" />
           </Animated.View>
-        ) : null}
 
-        <Animated.View entering={listEnter(2)}>
-          <Segmented value={tab} onChange={setTab} />
-        </Animated.View>
-
-        {visible.length === 0 ? (
-          <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>
-              {tab === 'upcoming' ? 'No upcoming bookings' : 'No past bookings'}
-            </Text>
-            {tab === 'upcoming' ? (
-              <Button label="Browse treatments" onPress={() => router.navigate('/')} />
-            ) : null}
-          </View>
-        ) : (
-          visible.map((booking, index) => (
-            <Animated.View key={booking.id} entering={listEnter(index + 3)}>
-              <BookingCard
-                booking={booking}
-                onCancel={() => {
-                  void cancelBooking(booking.id)
-                    .then(load)
-                    .catch(() => setError('We could not cancel this booking.'))
-                }}
-              />
+          {next ? (
+            <Animated.View entering={listEnter(1)}>
+              <NextVisit booking={next} />
             </Animated.View>
-          ))
-        )}
+          ) : null}
 
-        <TherapyStrip title="Explore treatments" therapies={explore} />
-      </ScrollView>
+          <Animated.View entering={listEnter(2)}>
+            <Segmented value={tab} onChange={setTab} />
+          </Animated.View>
+
+          {visible.length === 0 ? (
+            <View style={styles.empty}>
+              <Text style={styles.emptyTitle}>
+                {tab === 'upcoming' ? 'No upcoming bookings' : 'No past bookings'}
+              </Text>
+              {tab === 'upcoming' ? (
+                <Button label="Browse treatments" onPress={() => router.navigate('/')} />
+              ) : null}
+            </View>
+          ) : (
+            visible.map((booking, index) => (
+              <Animated.View key={booking.id} entering={listEnter(index + 3)}>
+                <BookingCard
+                  booking={booking}
+                  service={services.find((item) => item.id === booking.serviceId) ?? null}
+                  onCancel={() => {
+                    void cancelBooking(booking.id)
+                      .then(load)
+                      .catch(() => setError('We could not cancel this booking.'))
+                  }}
+                />
+              </Animated.View>
+            ))
+          )}
+
+          <TherapyStrip title="Explore treatments" services={explore} source="bookings-strip" />
+        </ScrollView>
+      </ZoomViewport>
     </View>
   )
 }
 
 function NextVisit({ booking }: { booking: Booking }) {
-  const therapy = therapyForTitle(booking.serviceTitle)
-  const image = therapy ? therapyImage(therapy.slug, null) : null
+  const image = mediaUrl(booking.serviceImagePath)
   return (
     <View style={styles.next}>
       {image ? <Image source={image} style={styles.nextImage} contentFit="cover" /> : null}
       <View style={styles.nextBody}>
         <Text style={styles.nextKicker}>Next visit</Text>
-        <Text style={styles.nextName}>{booking.serviceTitle ?? therapy?.name ?? 'Treatment'}</Text>
+        <Text style={styles.nextName}>{booking.serviceTitle ?? 'Treatment'}</Text>
         <Text style={styles.nextTime}>{formatVisit(booking.preferredAt)}</Text>
         <StatusPill status={booking.status} />
       </View>
@@ -154,19 +153,32 @@ function NextVisit({ booking }: { booking: Booking }) {
   )
 }
 
-function BookingCard({ booking, onCancel }: { booking: Booking; onCancel: () => void }) {
-  const therapy = therapyForTitle(booking.serviceTitle)
-  const image = therapy ? therapyImage(therapy.slug, null) : null
-  const content = (
-    <>
-      {image ? (
-        <Image source={image} style={styles.thumb} contentFit="cover" />
-      ) : (
-        <View style={styles.thumb} />
-      )}
+function BookingCard({
+  booking,
+  service,
+  onCancel,
+}: {
+  booking: Booking
+  service: Service | null
+  onCancel: () => void
+}) {
+  const image = mediaUrl(booking.serviceImagePath)
+  const zoom = useZoomSource(therapyGroup(`booking-${booking.id}`, booking.serviceId), service, {
+    radius: THUMB_RADIUS,
+  })
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={booking.serviceTitle ?? 'Treatment'}
+      onPress={zoom.open}
+      style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}
+    >
+      <Animated.View ref={zoom.ref} collapsable={false} style={[styles.thumb, zoom.imageStyle]}>
+        {image ? <Image source={image} style={styles.fill} contentFit="cover" /> : null}
+      </Animated.View>
       <View style={styles.cardBody}>
         <Text style={styles.name} numberOfLines={1}>
-          {booking.serviceTitle ?? therapy?.name ?? 'Treatment'}
+          {booking.serviceTitle ?? 'Treatment'}
         </Text>
         <Text style={styles.meta}>{formatVisit(booking.preferredAt)}</Text>
         <View style={styles.cardFooter}>
@@ -183,20 +195,12 @@ function BookingCard({ booking, onCancel }: { booking: Booking; onCancel: () => 
           </Text>
         ) : null}
       </View>
-    </>
-  )
-
-  if (!therapy) return <View style={styles.card}>{content}</View>
-  return (
-    <PressableScale
-      accessibilityRole="button"
-      onPress={() => router.push({ pathname: '/therapy/[slug]', params: { slug: therapy.slug } })}
-      style={styles.card}
-    >
-      {content}
-    </PressableScale>
+    </Pressable>
   )
 }
+
+// Matches theme.radius.sm: the zoom starts from these corners.
+const THUMB_RADIUS = 12
 
 function Segmented({ value, onChange }: { value: Tab; onChange: (tab: Tab) => void }) {
   const [width, setWidth] = useState(0)
@@ -350,7 +354,15 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.card,
     boxShadow: `0 4px 16px ${theme.colors.shadow}`,
   },
+  fill: {
+    width: '100%',
+    height: '100%',
+  },
+  pressed: {
+    opacity: 0.85,
+  },
   thumb: {
+    overflow: 'hidden',
     width: 84,
     height: 84,
     borderRadius: theme.radius.sm,

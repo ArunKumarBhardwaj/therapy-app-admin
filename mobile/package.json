@@ -2,11 +2,6 @@
   "name": "mobile",
   "version": "1.0.0",
   "main": "index.ts",
-  "reanimated": {
-    "staticFeatureFlags": {
-      "ENABLE_SHARED_ELEMENT_TRANSITIONS": true
-    }
-  },
   "dependencies": {
     "@expo-google-fonts/fraunces": "^0.4.1",
     "@expo-google-fonts/ibm-plex-sans": "^0.4.1",

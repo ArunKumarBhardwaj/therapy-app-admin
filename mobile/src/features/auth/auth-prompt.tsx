@@ -9,7 +9,7 @@ import { ms } from '@/lib/scale'
 type AuthPromptProps = {
   title: string
   body: string
-  image?: number
+  image?: string | null
 }
 
 export function AuthPrompt({ title, body, image }: AuthPromptProps) {

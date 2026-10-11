@@ -14,9 +14,9 @@ import { AuthPrompt } from '@/features/auth/auth-prompt'
 import { useSession } from '@/features/auth/session'
 import { listMyBookings } from '@/features/bookings/api'
 import { summarize } from '@/features/bookings/summary'
-import { THERAPIES, type Therapy } from '@/features/therapies/catalog'
-import { therapyForTitle } from '@/features/therapies/offerings'
+import { mediaUrl, useServices } from '@/features/therapies/api'
 import { TherapyStrip } from '@/features/therapies/therapy-strip'
+import { ZoomViewport } from '@/features/therapies/transition'
 import type { Booking } from '@/lib/domain'
 import { fail, notice, useFormAction } from '@/lib/form'
 import { listEnter } from '@/lib/motion'
@@ -35,6 +35,7 @@ export function AccountScreen() {
   const [fullName, setFullName] = useState(profile?.fullName ?? '')
   const [phone, setPhone] = useState(profile?.phone ?? '')
   const [bookings, setBookings] = useState<Booking[]>([])
+  const { services } = useServices()
   useFocusEffect(() => {
     if (status !== 'signed-in') return
     void listMyBookings()
@@ -43,11 +44,8 @@ export function AccountScreen() {
   })
 
   const summary = summarize(bookings)
-  const yours = new Map<string, Therapy>()
-  for (const booking of bookings) {
-    const therapy = therapyForTitle(booking.serviceTitle)
-    if (therapy) yours.set(therapy.slug, therapy)
-  }
+  const bookedIds = new Set(bookings.map((booking) => booking.serviceId))
+  const yours = services.filter((service) => bookedIds.has(service.id))
 
   const [saved, save, saving] = useFormAction(async () => {
     if (fullName.trim().length < 2) return fail('Keep the name you want on the booking.')
@@ -70,7 +68,7 @@ export function AccountScreen() {
       <AuthPrompt
         title="Your account"
         body="Sign in to keep your name and phone on a booking."
-        image={require('../../../../assets/therapy-shirovasthi.png')}
+        image={mediaUrl(services[1]?.imagePath ?? null)}
       />
     )
   }
@@ -79,73 +77,76 @@ export function AccountScreen() {
 
   return (
     <View style={styles.screen}>
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[
-          styles.content,
-          { paddingTop: 16 + insets.top, paddingBottom: 40 + insets.bottom },
-        ]}
-      >
-        <Text style={styles.title}>Account</Text>
+      <ZoomViewport>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={[
+            styles.content,
+            { paddingTop: 16 + insets.top, paddingBottom: 40 + insets.bottom },
+          ]}
+        >
+          <Text style={styles.title}>Account</Text>
 
-        <Animated.View entering={listEnter(0)} style={styles.profile}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials(profile?.fullName ?? null, profile?.email ?? null)}</Text>
-          </View>
-          <View style={styles.profileText}>
-            <Text style={styles.profileName} numberOfLines={1}>
-              {profile?.fullName ?? 'Add your name'}
-            </Text>
-            <Text style={styles.profileMeta} numberOfLines={1}>
-              {profile?.email ?? 'Signed in'}
-            </Text>
-            {profile?.phone ? <Text style={styles.profileMeta}>{profile.phone}</Text> : null}
-          </View>
-        </Animated.View>
+          <Animated.View entering={listEnter(0)} style={styles.profile}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{initials(profile?.fullName ?? null, profile?.email ?? null)}</Text>
+            </View>
+            <View style={styles.profileText}>
+              <Text style={styles.profileName} numberOfLines={1}>
+                {profile?.fullName ?? 'Add your name'}
+              </Text>
+              <Text style={styles.profileMeta} numberOfLines={1}>
+                {profile?.email ?? 'Signed in'}
+              </Text>
+              {profile?.phone ? <Text style={styles.profileMeta}>{profile.phone}</Text> : null}
+            </View>
+          </Animated.View>
 
-        <Animated.View entering={listEnter(1)} style={styles.stats}>
-          <StatTile value={summary.total} label="Bookings" />
-          <StatTile value={summary.upcoming.length} label="Upcoming" />
-          <StatTile value={summary.completed} label="Completed" />
-        </Animated.View>
+          <Animated.View entering={listEnter(1)} style={styles.stats}>
+            <StatTile value={summary.total} label="Bookings" />
+            <StatTile value={summary.upcoming.length} label="Upcoming" />
+            <StatTile value={summary.completed} label="Completed" />
+          </Animated.View>
 
-        <Animated.View entering={listEnter(2)} style={styles.section}>
-          <Text style={styles.sectionTitle}>Your details</Text>
-          <TextField
-            label="Full name"
-            value={fullName}
-            onChangeText={setFullName}
-            autoComplete="name"
-            autoCapitalize="words"
+          <Animated.View entering={listEnter(2)} style={styles.section}>
+            <Text style={styles.sectionTitle}>Your details</Text>
+            <TextField
+              label="Full name"
+              value={fullName}
+              onChangeText={setFullName}
+              autoComplete="name"
+              autoCapitalize="words"
+            />
+            <TextField
+              label="Phone"
+              value={phone}
+              onChangeText={setPhone}
+              autoComplete="tel"
+              keyboardType="phone-pad"
+            />
+            <FormMessage result={saved} />
+            <Button label="Save" onPress={save} pending={saving} />
+          </Animated.View>
+
+          <TherapyStrip
+            title={yours.length > 0 ? 'Your treatments' : 'Explore treatments'}
+            services={yours.length > 0 ? yours : services.slice(8, 16)}
+            source="account-strip"
           />
-          <TextField
-            label="Phone"
-            value={phone}
-            onChangeText={setPhone}
-            autoComplete="tel"
-            keyboardType="phone-pad"
-          />
-          <FormMessage result={saved} />
-          <Button label="Save" onPress={save} pending={saving} />
-        </Animated.View>
 
-        <TherapyStrip
-          title={yours.size > 0 ? 'Your treatments' : 'Explore treatments'}
-          therapies={yours.size > 0 ? [...yours.values()] : THERAPIES.slice(8, 16)}
-        />
+          <Animated.View entering={listEnter(3)} style={styles.menu}>
+            <MenuRow label="My bookings" onPress={() => router.navigate('/bookings')} />
+            <MenuRow label="Browse treatments" onPress={() => router.navigate('/')} />
+            <MenuRow label="Change password" onPress={resetPassword} />
+            <MenuRow label="Sign out" tone="danger" last onPress={() => void signOut()} />
+          </Animated.View>
+          <FormMessage result={reset} />
 
-        <Animated.View entering={listEnter(3)} style={styles.menu}>
-          <MenuRow label="My bookings" onPress={() => router.navigate('/bookings')} />
-          <MenuRow label="Browse treatments" onPress={() => router.navigate('/')} />
-          <MenuRow label="Change password" onPress={resetPassword} />
-          <MenuRow label="Sign out" tone="danger" last onPress={() => void signOut()} />
-        </Animated.View>
-        <FormMessage result={reset} />
-
-        <Text style={styles.version}>
-          {brand.name} · Version {version}
-        </Text>
-      </ScrollView>
+          <Text style={styles.version}>
+            {brand.name} · Version {version}
+          </Text>
+        </ScrollView>
+      </ZoomViewport>
     </View>
   )
 }

@@ -1,15 +1,22 @@
-import { Image } from 'expo-image'
 import { router } from 'expo-router'
 import { Pressable, ScrollView, Text, View } from 'react-native'
+import Animated from 'react-native-reanimated'
 import { StyleSheet } from 'react-native-unistyles'
-import { PressableScale } from '@/components/pressable-scale'
-import { therapyImage } from '@/features/therapies/art'
-import type { Therapy } from '@/features/therapies/catalog'
+import { TherapyImage } from '@/features/therapies/therapy-image'
+import { therapyGroup, useZoomSource } from '@/features/therapies/transition'
+import type { Service } from '@/lib/domain'
 import { formatDuration } from '@/lib/format'
 import { ms } from '@/lib/scale'
 
-export function TherapyStrip({ title, therapies }: { title: string; therapies: Therapy[] }) {
-  if (therapies.length === 0) return null
+type TherapyStripProps = {
+  title: string
+  services: Service[]
+  /** Unique per screen so two strips never share a transition group. */
+  source: string
+}
+
+export function TherapyStrip({ title, services, source }: TherapyStripProps) {
+  if (services.length === 0) return null
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
@@ -24,34 +31,41 @@ export function TherapyStrip({ title, therapies }: { title: string; therapies: T
         contentContainerStyle={styles.row}
         style={styles.bleed}
       >
-        {therapies.map((therapy) => (
-          <PressableScale
-            key={therapy.slug}
-            accessibilityRole="button"
-            accessibilityLabel={therapy.name}
-            onPress={() =>
-              router.push({ pathname: '/therapy/[slug]', params: { slug: therapy.slug } })
-            }
-            style={styles.card}
-          >
-            <Image
-              source={therapyImage(therapy.slug, null)}
-              style={styles.image}
-              contentFit="cover"
-              transition={150}
-            />
-            <Text style={styles.name} numberOfLines={1}>
-              {therapy.name}
-            </Text>
-            <Text style={styles.meta}>{formatDuration(therapy.typicalMinutes)}</Text>
-          </PressableScale>
+        {services.map((service) => (
+          <StripCard key={service.id} service={service} source={source} />
         ))}
       </ScrollView>
     </View>
   )
 }
 
+function StripCard({ service, source }: { service: Service; source: string }) {
+  const zoom = useZoomSource(therapyGroup(source, service.id), service, { radius: IMAGE_RADIUS })
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={service.title}
+      onPress={zoom.open}
+      style={({ pressed }) => [styles.card, pressed ? styles.pressed : null]}
+    >
+      <Animated.View ref={zoom.ref} collapsable={false} style={[styles.image, zoom.imageStyle]}>
+        <TherapyImage service={service} />
+      </Animated.View>
+      <Text style={styles.name} numberOfLines={1}>
+        {service.title}
+      </Text>
+      <Text style={styles.meta}>{formatDuration(service.durationMinutes)}</Text>
+    </Pressable>
+  )
+}
+
+// Matches theme.radius.sm: the zoom starts from these corners.
+const IMAGE_RADIUS = 12
+
 const styles = StyleSheet.create((theme) => ({
+  pressed: {
+    opacity: 0.85,
+  },
   wrap: {
     gap: 12,
   },
@@ -90,6 +104,7 @@ const styles = StyleSheet.create((theme) => ({
   image: {
     width: '100%',
     height: 112,
+    overflow: 'hidden',
     borderRadius: theme.radius.sm,
     marginBottom: 4,
     backgroundColor: theme.colors.secondary,

@@ -7,17 +7,20 @@ import { ms } from '@/lib/scale'
 type BackLinkProps = {
   label?: string
   floating?: boolean
+  onPress?: () => void
 }
 
-export function BackLink({ label = 'Back', floating = false }: BackLinkProps) {
+function goBack() {
+  if (router.canGoBack()) router.back()
+  else router.replace('/')
+}
+
+export function BackLink({ label = 'Back', floating = false, onPress = goBack }: BackLinkProps) {
   return (
     <PressableScale
       accessibilityRole="button"
       accessibilityLabel={label}
-      onPress={() => {
-        if (router.canGoBack()) router.back()
-        else router.replace('/')
-      }}
+      onPress={onPress}
       style={[styles.button, floating ? styles.floating : null]}
     >
       <Text style={styles.arrow}>←</Text>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Text } from 'react-native'
 import { router, useLocalSearchParams } from 'expo-router'
 import { StyleSheet } from 'react-native-unistyles'
@@ -11,8 +11,7 @@ import { AuthPrompt } from '@/features/auth/auth-prompt'
 import { useSession } from '@/features/auth/session'
 import { createBooking } from '@/features/bookings/api'
 import { PreferredAtField } from '@/features/bookings/preferred-at'
-import { listActiveServices } from '@/features/therapies/api'
-import { findOffering } from '@/features/therapies/offerings'
+import { useService } from '@/features/therapies/api'
 import { fail, useFormAction, type FormResult } from '@/lib/form'
 import { ms } from '@/lib/scale'
 
@@ -24,37 +23,17 @@ function defaultTime() {
 }
 
 export function BookScreen() {
-  const { slug } = useLocalSearchParams<{ slug: string }>()
+  const { id } = useLocalSearchParams<{ id: string }>()
   const { profile, status } = useSession()
-  const [title, setTitle] = useState('Request a time')
-  const [serviceId, setServiceId] = useState<string | null>(null)
+  const { service, status: loadStatus } = useService(id)
   const [when, setWhen] = useState(defaultTime)
   const [notes, setNotes] = useState('')
-  const [closed, setClosed] = useState<FormResult>(null)
-
-  useEffect(() => {
-    if (status !== 'signed-in') return
-    let alive = true
-    async function load() {
-      const services = await listActiveServices().catch(() => null)
-      if (!alive) return
-      if (!services) {
-        setClosed(fail('The schedule is offline.'))
-        return
-      }
-      const offering = slug ? findOffering(slug, services) : null
-      if (!offering?.service) {
-        setClosed(fail('This treatment is not open for booking.'))
-        return
-      }
-      setTitle(offering.therapy.name)
-      setServiceId(offering.service.id)
-    }
-    void load()
-    return () => {
-      alive = false
-    }
-  }, [slug, status])
+  const title = service?.title ?? 'Request a time'
+  const serviceId = service?.id ?? null
+  const closed: FormResult =
+    service || loadStatus === 'loading' || loadStatus === 'idle'
+      ? null
+      : fail(loadStatus === 'error' ? 'The schedule is offline.' : 'This treatment is not open for booking.')
 
   const [result, submit, pending] = useFormAction(async () => {
     if (!profile || !serviceId) return null

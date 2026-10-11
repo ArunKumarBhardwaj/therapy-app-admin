@@ -8,6 +8,16 @@ export type Profile = {
   role: Role
 }
 
+export type ServiceCategory = 'panchakarma' | 'body' | 'head' | 'eyes' | 'local'
+
+export const SERVICE_CATEGORIES: { id: ServiceCategory; title: string }[] = [
+  { id: 'panchakarma', title: 'Panchakarma' },
+  { id: 'body', title: 'Oil and touch' },
+  { id: 'head', title: 'Head' },
+  { id: 'eyes', title: 'Eyes' },
+  { id: 'local', title: 'Local care' },
+]
+
 export type Service = {
   id: string
   title: string
@@ -17,6 +27,11 @@ export type Service = {
   price: number
   durationMinutes: number
   isActive: boolean
+  category: ServiceCategory
+  focus: string
+  alsoCalled: string | null
+  soughtFor: string[]
+  sortOrder: number
 }
 
 export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed'
@@ -28,12 +43,13 @@ export type Booking = {
   status: BookingStatus
   notes: string | null
   serviceTitle: string | null
+  serviceImagePath: string | null
 }
 
 export const SERVICE_MEDIA_BUCKET = 'service-media'
 
 const SERVICE_COLUMNS =
-  'id, title, description, image_path, video_path, price, duration_minutes, is_active'
+  'id, title, description, image_path, video_path, price, duration_minutes, is_active, category, focus, also_called, sought_for, sort_order'
 
 export { SERVICE_COLUMNS }
 
@@ -59,6 +75,18 @@ function asNumber(value: unknown): number | null {
     if (Number.isFinite(parsed)) return parsed
   }
   return null
+}
+
+function asCategory(value: unknown): ServiceCategory {
+  return SERVICE_CATEGORIES.find((category) => category.id === value)?.id ?? 'body'
+}
+
+function asTags(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((item) => {
+    const tag = asNullableString(item)
+    return tag ? [tag] : []
+  })
 }
 
 function asStatus(value: unknown): BookingStatus | null {
@@ -105,6 +133,11 @@ export function parseService(row: unknown): Service | null {
     price,
     durationMinutes,
     isActive: record.is_active,
+    category: asCategory(record.category),
+    focus: asNullableString(record.focus) ?? '',
+    alsoCalled: asNullableString(record.also_called),
+    soughtFor: asTags(record.sought_for),
+    sortOrder: asNumber(record.sort_order) ?? 0,
   }
 }
 
@@ -124,6 +157,7 @@ export function parseBooking(row: unknown): Booking | null {
     status,
     notes: asNullableString(record.notes),
     serviceTitle: asNullableString(service?.title),
+    serviceImagePath: asNullableString(service?.image_path),
   }
 }
 

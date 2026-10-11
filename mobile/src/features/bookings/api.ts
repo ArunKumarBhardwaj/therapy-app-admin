@@ -2,7 +2,7 @@ import { parseBooking, type Booking, type Profile } from '@/lib/domain'
 import { getSupabase } from '@/lib/supabase'
 
 const BOOKING_COLUMNS =
-  'id, service_id, preferred_at, status, notes, services(title)'
+  'id, service_id, preferred_at, status, notes, services(title, image_path)'
 
 export async function listMyBookings(): Promise<Booking[]> {
   const supabase = await getSupabase()
