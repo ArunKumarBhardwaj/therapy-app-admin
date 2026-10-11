@@ -2,13 +2,15 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { parseService, type Service } from '@/lib/domain'
 
 const SERVICE_COLUMNS =
-  'id, title, description, image_path, video_path, price, duration_minutes, is_active'
+  'id, title, description, image_path, video_path, price, duration_minutes, is_active, category, focus, also_called, sought_for, sort_order'
 
 export async function listServices(
   supabase: SupabaseClient,
   options?: { activeOnly?: boolean },
 ): Promise<Service[]> {
-  let query = supabase.from('services').select(SERVICE_COLUMNS).order('title')
+  let query = supabase.from('services').select(SERVICE_COLUMNS)
+    .order('sort_order')
+    .order('title')
   if (options?.activeOnly) {
     query = query.eq('is_active', true)
   }

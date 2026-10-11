@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import type { Service } from '@/lib/domain'
+import { SERVICE_CATEGORIES, type Service } from '@/lib/domain'
 
 const initialState: ServiceFormState = { error: null }
 
@@ -42,6 +42,60 @@ export function ServiceForm({
           rows={5}
           defaultValue={service?.description}
         />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="focus">Focus</Label>
+        <Input
+          id="focus"
+          name="focus"
+          defaultValue={service?.focus}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="alsoCalled">Also called</Label>
+        <Input
+          id="alsoCalled"
+          name="alsoCalled"
+          defaultValue={service?.alsoCalled ?? ''}
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="soughtFor">Sought for</Label>
+        <Input
+          id="soughtFor"
+          name="soughtFor"
+          defaultValue={service?.soughtFor.join(', ')}
+        />
+        <p className="text-sm text-muted-foreground">
+          Comma separated, e.g. Stress, Sleep
+        </p>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="category">Category</Label>
+          <select
+            id="category"
+            name="category"
+            defaultValue={service?.category ?? 'body'}
+            className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+          >
+            {SERVICE_CATEGORIES.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="sortOrder">Sort order</Label>
+          <Input
+            id="sortOrder"
+            name="sortOrder"
+            type="number"
+            step="1"
+            defaultValue={service?.sortOrder ?? 0}
+          />
+        </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">

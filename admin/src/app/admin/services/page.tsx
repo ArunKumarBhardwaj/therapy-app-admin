@@ -11,9 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { SERVICE_CATEGORIES } from '@/lib/domain'
 import { formatDuration, formatPrice } from '@/lib/format'
 import { listServices } from '@/lib/services'
-import { ensureTherapyCatalog } from '@/lib/therapy-seed'
 import { requireAdmin } from '@/lib/session'
 
 export const metadata: Metadata = {
@@ -22,7 +22,6 @@ export const metadata: Metadata = {
 
 export default async function ServicesPage() {
   const auth = await requireAdmin()
-  if (auth) await ensureTherapyCatalog(auth.supabase)
   const services = auth ? await listServices(auth.supabase) : []
 
   return (
@@ -31,7 +30,7 @@ export default async function ServicesPage() {
         <div>
           <h1 className="font-serif text-3xl tracking-tight">Services</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            These are the 25 treatments. Active ones show in the app. Set a price before you take bookings.
+            Active services show in the app, in sort order.
           </p>
         </div>
         <Button asChild>
@@ -46,6 +45,7 @@ export default async function ServicesPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Title</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Duration</TableHead>
               <TableHead>Status</TableHead>
@@ -56,6 +56,9 @@ export default async function ServicesPage() {
             {services.map((service) => (
               <TableRow key={service.id}>
                 <TableCell className="font-medium">{service.title}</TableCell>
+                <TableCell>
+                  {SERVICE_CATEGORIES.find((item) => item.id === service.category)?.label}
+                </TableCell>
                 <TableCell>{formatPrice(service.price)}</TableCell>
                 <TableCell>{formatDuration(service.durationMinutes)}</TableCell>
                 <TableCell>

@@ -9,6 +9,16 @@ export type Profile = {
   createdAt: string | null
 }
 
+export const SERVICE_CATEGORIES = [
+  { id: 'panchakarma', label: 'Panchakarma' },
+  { id: 'body', label: 'Oil and touch' },
+  { id: 'head', label: 'Head' },
+  { id: 'eyes', label: 'Eyes' },
+  { id: 'local', label: 'Local care' },
+] as const
+
+export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number]['id']
+
 export type Service = {
   id: string
   title: string
@@ -18,6 +28,11 @@ export type Service = {
   price: number
   durationMinutes: number
   isActive: boolean
+  category: ServiceCategory
+  focus: string
+  alsoCalled: string | null
+  soughtFor: string[]
+  sortOrder: number
 }
 
 export type SessionState =
@@ -39,6 +54,20 @@ function asNullableString(value: unknown): string | null {
 
 function asRole(value: unknown): Role | null {
   return value === 'user' || value === 'admin' ? value : null
+}
+
+function asCategory(value: unknown): ServiceCategory {
+  const match = SERVICE_CATEGORIES.find((category) => category.id === value)
+  return match ? match.id : 'body'
+}
+
+function asStringList(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((item) => {
+    if (typeof item !== 'string') return []
+    const trimmed = item.trim()
+    return trimmed.length > 0 ? [trimmed] : []
+  })
 }
 
 function asNumber(value: unknown): number | null {
@@ -83,6 +112,11 @@ export function parseService(row: unknown): Service | null {
     price,
     durationMinutes,
     isActive: record.is_active,
+    category: asCategory(record.category),
+    focus: typeof record.focus === 'string' ? record.focus : '',
+    alsoCalled: asNullableString(record.also_called),
+    soughtFor: asStringList(record.sought_for),
+    sortOrder: asNumber(record.sort_order) ?? 0,
   }
 }
 

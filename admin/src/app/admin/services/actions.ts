@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { SERVICE_MEDIA_BUCKET } from '@/lib/domain'
+import { SERVICE_CATEGORIES, SERVICE_MEDIA_BUCKET, type ServiceCategory } from '@/lib/domain'
 import { requireAdmin } from '@/lib/session'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -16,7 +16,29 @@ function readFields(formData: FormData) {
   const price = Number(formData.get('price'))
   const durationMinutes = Number(formData.get('durationMinutes'))
   const isActive = formData.get('isActive') === 'on'
-  return { title, description, price, durationMinutes, isActive }
+  const categoryInput = String(formData.get('category') ?? '')
+  const category: ServiceCategory =
+    SERVICE_CATEGORIES.find((item) => item.id === categoryInput)?.id ?? 'body'
+  const focus = String(formData.get('focus') ?? '').trim()
+  const alsoCalled = String(formData.get('alsoCalled') ?? '').trim() || null
+  const soughtFor = String(formData.get('soughtFor') ?? '')
+    .split(',')
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+  const sortInput = Math.trunc(Number(formData.get('sortOrder')))
+  const sortOrder = Number.isFinite(sortInput) ? sortInput : 0
+  return {
+    title,
+    description,
+    price,
+    durationMinutes,
+    isActive,
+    category,
+    focus,
+    alsoCalled,
+    soughtFor,
+    sortOrder,
+  }
 }
 
 function fileFrom(formData: FormData, name: string): File | null {
@@ -91,6 +113,11 @@ export async function createService(
     price: fields.price,
     duration_minutes: fields.durationMinutes,
     is_active: fields.isActive,
+    category: fields.category,
+    focus: fields.focus,
+    also_called: fields.alsoCalled,
+    sought_for: fields.soughtFor,
+    sort_order: fields.sortOrder,
     image_path: imagePath,
     video_path: videoPath,
   })
@@ -127,6 +154,11 @@ export async function updateService(
     price: fields.price,
     duration_minutes: fields.durationMinutes,
     is_active: fields.isActive,
+    category: fields.category,
+    focus: fields.focus,
+    also_called: fields.alsoCalled,
+    sought_for: fields.soughtFor,
+    sort_order: fields.sortOrder,
   }
 
   if (thumbnail) {
